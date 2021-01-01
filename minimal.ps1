@@ -30,14 +30,7 @@ $tweaks = @(
 	
 	### Chris Titus Tech Additions
 	"TitusRegistryTweaks",
-	"InstallTitusProgs", #REQUIRED FOR OTHER PROGRAM INSTALLS!
-	#"Install7Zip",
-	#"InstallNotepadplusplus",
-	#"InstallIrfanview",
-	#"InstallVLC",
-	#"InstallAdobe",
-	#"InstallBrave",
-	#"ChangeDefaultApps",
+	"InstallOOShutUp10",
 
 	### Windows Apps
 	"DebloatAll",
@@ -89,7 +82,7 @@ $tweaks = @(
 	"DisableHomeGroups",          # "EnableHomeGroups",
 	"DisableSharedExperiences",     # "EnableSharedExperiences",
 	"DisableRemoteAssistance",      # "EnableRemoteAssistance",
-	"DisableRemoteDesktop",          # "DisableRemoteDesktop",
+	"DisableRemoteDesktop",         #"EnableRemoteDesktop",    
 	"DisableAutoplay",              # "EnableAutoplay",
 	"DisableAutorun",               # "EnableAutorun",
 	"DisableStorageSense",        # "EnableStorageSense",
@@ -99,7 +92,7 @@ $tweaks = @(
 	"SetBIOSTimeUTC",             # "SetBIOSTimeLocal",
 	"DisableHibernation",		# "EnableHibernation",          # 
 	"EnableSleepButton",		# "DisableSleepButton",         
-	"DisableSleepTimeout",        # "EnableSleepTimeout",
+	#"DisableSleepTimeout",        # "EnableSleepTimeout",
 	# "DisableFastStartup",         # "EnableFastStartup",
 
 	### UI Tweaks ###
@@ -157,19 +150,19 @@ $tweaks = @(
     # "EnableOneDrive",
 	"UninstallMsftBloat",           # "InstallMsftBloat",
 	"UninstallThirdPartyBloat",     # "InstallThirdPartyBloat",
-	"UninstallWindowsStore",      # "InstallWindowsStore",
-	"DisableXboxFeatures",          # "EnableXboxFeatures",
+	 "UninstallWindowsStore",      # "InstallWindowsStore",
+	 "DisableXboxFeatures",          # "EnableXboxFeatures",
 	"DisableAdobeFlash",            # "EnableAdobeFlash",
 	"InstallMediaPlayer", 		# "UninstallMediaPlayer",
 	"UninstallInternetExplorer",  # "InstallInternetExplorer",
 	"UninstallWorkFolders",       # "InstallWorkFolders",
-	"InstallLinuxSubsystem",      # "UninstallLinuxSubsystem",
-	# "InstallHyperV",              # "UninstallHyperV",
+	"UninstallLinuxSubsystem",      #"InstallLinuxSubsystem",      
+	 "UninstallHyperV",             # "InstallHyperV",              
 	"SetPhotoViewerAssociation",    # "UnsetPhotoViewerAssociation",
 	"AddPhotoViewerOpenWith",       # "RemovePhotoViewerOpenWith",
-	"InstallPDFPrinter"		# "UninstallPDFPrinter",
-	# "UninstallXPSPrinter",          # "InstallXPSPrinter",
-	# "RemoveFaxPrinter",             # "AddFaxPrinter",
+	"UninstallPDFPrinter",          #"InstallPDFPrinter"		
+	 "UninstallXPSPrinter",          # "InstallXPSPrinter",
+	 "RemoveFaxPrinter",             # "AddFaxPrinter",
 
 	### Server Specific Tweaks ###
 	# "HideServerManagerOnLogin",   # "ShowServerManagerOnLogin",
@@ -190,35 +183,6 @@ $tweaks = @(
 # Recommended Titus Customizations
 #########
 
-function Show-Choco-Menu {
-    param(
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]$Title,
-    
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]$ChocoInstall
-    )
-   
- do
- {
-    Clear-Host
-    Write-Host "================ $Title ================"
-    Write-Host "Y: Press 'Y' to do this."
-    Write-Host "2: Press 'N' to skip this."
-	Write-Host "Q: Press 'Q' to stop the entire script."
-    $selection = Read-Host "Please make a selection"
-    switch ($selection)
-    {
-    'y' { choco install $ChocoInstall -y }
-    'n' { Break }
-    'q' { Exit  }
-    }
- }
- until ($selection -match "y" -or $selection -match "n" -or $selection -match "q")
-}
-
 Function TitusRegistryTweaks {
 	Write-Output "Improving Windows Update to delay Feature updates and only install Security Updates"
 	### Fix Windows Update to delay feature updates and only update at certain times
@@ -234,10 +198,7 @@ Function TitusRegistryTweaks {
 	If (!(Get-ItemProperty $UpdatesPath  DeferQualityUpdatesPeriodInDays)) { New-ItemProperty -Path $UpdatesPath -Name "ActiveHoursStart" -Type DWord -Value 8 }
 	Set-ItemProperty -Path $UpdatesPath -Name "ActiveHoursStart" -Type DWord -Value 8
 }
-Function InstallTitusProgs {
-	Write-Output "Installing Chocolatey"
-	Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-	choco install chocolatey-core.extension -y
+Function InstallOOShutUp10 {
 	Write-Output "Running O&O Shutup with Recommended Settings"
 	Import-Module BitsTransfer
 	Start-BitsTransfer -Source "https://raw.githubusercontent.com/ChrisTitusTech/win10script/master/ooshutup10.cfg" -Destination ooshutup10.cfg
@@ -245,53 +206,7 @@ Function InstallTitusProgs {
 	./OOSU10.exe ooshutup10.cfg /quiet
 }
 
-Function InstallAdobe {
-	Show-Choco-Menu -Title "Do you want to install Adobe Acrobat Reader?" -ChocoInstall "adobereader"
-}
 
-Function InstallBrave {
-	do
- {
-    Clear-Host
-    Write-Host "================ Do You Want to Install Brave Browser? ================"
-    Write-Host "Y: Press 'Y' to do this."
-    Write-Host "2: Press 'N' to skip this."
-	Write-Host "Q: Press 'Q' to stop the entire script."
-    $selection = Read-Host "Please make a selection"
-    switch ($selection)
-    {
-    'y' { 
-		Invoke-WebRequest -Uri "https://laptop-updates.brave.com/download/CHR253" -OutFile $env:USERPROFILE\Downloads\brave.exe
-		~/Downloads/brave.exe
-	}
-    'n' { Break }
-    'q' { Exit  }
-    }
- }
- until ($selection -match "y" -or $selection -match "n" -or $selection -match "q")
-	
-}
-Function Install7Zip {
-	Show-Choco-Menu -Title "Do you want to install 7-Zip?" -ChocoInstall "7zip"
-}
-
-Function InstallNotepadplusplus {
-	Show-Choco-Menu -Title "Do you want to install Notepad++?" -ChocoInstall "notepadplusplus"
-}
-
-Function InstallVLC {
-	Show-Choco-Menu -Title "Do you want to install VLC?" -ChocoInstall "vlc"
-}
-
-Function InstallIrfanview {
-	Show-Choco-Menu -Title "Do you want to install Irfanview?" -ChocoInstall "irfanview"
-}
-
-Function ChangeDefaultApps {
-	Write-Output "Setting Default Programs - Notepad++ Brave VLC IrFanView"
-	Start-BitsTransfer -Source "https://raw.githubusercontent.com/ChrisTitusTech/win10script/master/MyDefaultAppAssociations.xml" -Destination $HOME\Desktop\MyDefaultAppAssociations.xml
-	dism /online /Import-DefaultAppAssociations:"%UserProfile%\Desktop\MyDefaultAppAssociations.xml"
-}
 
 ##########
 # Privacy Tweaks
@@ -2010,12 +1925,9 @@ Function UninstallMsftBloat {
 	Get-AppxPackage "Microsoft.Getstarted" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.Messaging" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.Microsoft3DViewer" | Remove-AppxPackage
-	Get-AppxPackage "Microsoft.MicrosoftOfficeHub" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.MicrosoftPowerBIForWindows" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.MicrosoftSolitaireCollection" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.MicrosoftStickyNotes" | Remove-AppxPackage
-	Get-AppxPackage "Microsoft.MinecraftUWP" | Remove-AppxPackage
-	Get-AppxPackage "Microsoft.MSPaint" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.NetworkSpeedTest" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.Office.OneNote" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.Office.Sway" | Remove-AppxPackage
@@ -2023,7 +1935,6 @@ Function UninstallMsftBloat {
 	Get-AppxPackage "Microsoft.People" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.Print3D" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.RemoteDesktop" | Remove-AppxPackage
-	Get-AppxPackage "Microsoft.SkypeApp" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.Wallet" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.WindowsAlarms" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.WindowsCamera" | Remove-AppxPackage
@@ -2637,7 +2548,7 @@ Function DebloatAll {
         "*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
         "*Microsoft.Advertising.Xaml_10.1712.5.0_x86__8wekyb3d8bbwe*"
         "*Microsoft.BingWeather*"
-        "*Microsoft.MSPaint*"
+        #"*Microsoft.MSPaint*"
         "*Microsoft.MicrosoftStickyNotes*"
         "*Microsoft.Windows.Photos*"
         "*Microsoft.WindowsCalculator*"
